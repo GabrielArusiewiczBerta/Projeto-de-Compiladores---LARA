@@ -152,6 +152,7 @@ void codegen_program(codegen_ctx_t *ctx, ast_node_t *program)
                 
                 global_offset += size;
             }
+        }
 
         decl = decl->next;
     }
