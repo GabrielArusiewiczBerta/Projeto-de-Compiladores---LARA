@@ -130,3 +130,54 @@ void symtab_free(symtab_t *tab)
     }
     free(tab);
 }
+
+/*-------------------------------
+* Função auxiliar para tamanho de cada variavel
+* Fiz somente dos basicos e do resto chutei 8
+* Temos que fazer de todos os tipos do pdf?
+*---------------------------------*/
+static int get_type_size(sym_datatype_t type) {
+    switch (type) {
+        case SYM_TYPE_INT:   return 4;
+        case SYM_TYPE_FLOAT: return 8;
+        case SYM_TYPE_CHAR:  return 1;
+        case SYM_TYPE_BOOL:  return 1;
+        default:             return 0; // Para void ou desconhecidos
+    }
+}
+
+/*
+* Função da tarefa E2 - A
+*/
+void symtab_set_offsets(symtab_t *tab, sym_scope_t scope) {
+    if (tab == NULL) return;
+
+    int current_offset = 0;
+
+    // Percorre todos os buckets da hash table
+    for (int i = 0; i < SYMTAB_SIZE; i++) {
+        sym_entry_t *entry = tab->buckets[i];
+        
+        // Percorre a lista ligada em cada bucket
+        while (entry != NULL) {
+            // Apenas processa símbolos que pertencem ao escopo atual
+            if (entry->scope == scope) {
+                // 1. Define o offset atual para este símbolo
+                entry->offset = current_offset;
+                
+                // 2. Calcula quanto espaço ele ocupa
+                int base_size = get_type_size(entry->datatype);
+                int total_size = base_size;
+                
+                // 3. Se for array, multiplica pelo tamanho do array
+                if (entry->nature == SYM_ARRAY) {
+                    total_size = base_size * entry->array_size;
+                }
+                
+                // 4. Incrementa o offset para a próxima variável
+                current_offset += total_size;
+            }
+            entry = entry->next;
+        }
+    }
+}

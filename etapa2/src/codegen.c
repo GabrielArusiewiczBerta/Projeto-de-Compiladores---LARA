@@ -129,11 +129,30 @@ void codegen_program(codegen_ctx_t *ctx, ast_node_t *program)
      */
 
     /* Código parcial fornecido como exemplo — processa apenas funções */
+    int global_offset = 0;
     while (decl) {
         if (decl->type == AST_FUN_DECL) {
             codegen_fun(ctx, decl);
         }
         /* TODO-E2-A: adicione tratamento para AST_VAR_DECL e AST_ARRAY_DECL */
+        if (decl->type == AST_VAR_DECL || decl->type == AST_ARRAY_DECL) {
+            sym_entry_t *e = symtab_lookup(ctx->symtab, decl->value);
+            if (e) {
+                e->scope = SYM_SCOPE_GLOBAL;
+                e->offset = global_offset;
+                
+                int size = type_size(e->datatype);
+                if (decl->type == AST_ARRAY_DECL) {
+                    size *= e->array_size;
+                }
+                
+                char size_str[16];
+                snprintf(size_str, sizeof(size_str), "%d", size);
+                codegen_emit(ctx, TAC_DECL_GLOBAL, decl->value, size_str, NULL);
+                
+                global_offset += size;
+            }
+
         decl = decl->next;
     }
 }
@@ -237,7 +256,16 @@ void codegen_stmt(codegen_ctx_t *ctx, ast_node_t *stmt)
         case AST_ASSIGN: {
             if (strcmp(stmt->value, ":=") == 0) {
                 /* TODO-E2-D: implemente aqui */
-                fprintf(stderr, "[CODEGEN] TODO-E2-D: atribuição não implementada ainda.\n");
+                //fprintf(stderr, "[CODEGEN] TODO-E2-D: atribuição não implementada ainda.\n");
+                
+                char *rval = codegen_expr(ctx, stmt->children[1]);
+                // Para AST_ASSIGN simples, o lvalue está em children[0]
+                char *lname = stmt->children[0]->value; 
+                
+                codegen_emit(ctx, TAC_COPY, lname, rval, NULL);
+                
+                free(rval);
+
             } else if (strcmp(stmt->value, "+=") == 0) {
                 /* compound assignment += */
                 char *lname = stmt->children[0]->value;
@@ -381,7 +409,8 @@ char *codegen_expr(codegen_ctx_t *ctx, ast_node_t *expr)
              */
             if (op != TAC_NOP) {
                 /* TODO-E2-B e TODO-E2-C: substitua a linha abaixo */
-                codegen_emit(ctx, TAC_NOP, tmp, left, right);
+                //codegen_emit(ctx, TAC_NOP, tmp, left, right);
+                codegen_emit(ctx, op, tmp, left, right);
                 /* pela linha correta: */
                 /* codegen_emit(ctx, op, tmp, left, right); */
             } else {
