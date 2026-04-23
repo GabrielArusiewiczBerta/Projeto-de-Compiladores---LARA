@@ -261,10 +261,17 @@ void codegen_stmt(codegen_ctx_t *ctx, ast_node_t *stmt)
                 
                 char *rval = codegen_expr(ctx, stmt->children[1]);
                 // Para AST_ASSIGN simples, o lvalue está em children[0]
-                char *lname = stmt->children[0]->value; 
-                
-                codegen_emit(ctx, TAC_COPY, lname, rval, NULL);
-                
+
+                ast_node_t *lvalue = stmt->children[0];
+                if (lvalue->type == AST_EXPR_INDEX) {
+                    char *idx = codegen_expr(ctx, lvalue->children[0]);
+                    codegen_emit(ctx, TAC_STORE, lvalue->value, idx, rval);
+                    free(idx);
+                } else {
+                    char *lname = lvalue->value;
+                    codegen_emit(ctx, TAC_COPY, lname, rval, NULL);
+                }
+
                 free(rval);
 
             } else if (strcmp(stmt->value, "+=") == 0) {
