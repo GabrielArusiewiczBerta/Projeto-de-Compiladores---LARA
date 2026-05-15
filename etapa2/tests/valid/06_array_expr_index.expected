@@ -1,0 +1,16 @@
+    global v, 40
+    beginFunc main
+    local i, 0
+    i = 2
+    local j, 4
+    j = 3
+    _t1 = i + j
+    v[_t1] = 15
+    _t2 = j - 1
+    _t3 = v[_t2]
+    _t4 = i * 2
+    v[_t4] = _t3
+    _t5 = i + j
+    _t6 = v[_t5]
+    print _t6
+    endFunc main
