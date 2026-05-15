@@ -1,0 +1,15 @@
+/* 06_array_expr_index.lc — Índices compostos em arrays
+ * Testa: TAC_STORE e TAC_LOAD quando o índice é uma expressão
+ *        (i+j, i*2, j-1), e não apenas um literal ou identificador.
+ *        Exercita a avaliação recursiva de codegen_expr() dentro de
+ *        AST_EXPR_INDEX, tanto no lvalue quanto no rvalue.
+ */
+array 10 of int v ;
+
+fun void main() {
+    let i := 2 ;
+    let j := 3 ;
+    v[i + j] := 15 ;
+    v[i * 2] := v[j - 1] ;
+    print v[i + j] ;
+}
