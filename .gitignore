@@ -1,0 +1,27 @@
+# Arquivos gerados pela compilação
+*.o
+
+# Binários do compilador
+compilador
+etapa2/compilador
+etapa3/compilador
+
+# Arquivos gerados pelo flex e bison
+src/lex.yy.c
+src/parser.tab.c
+src/parser.tab.h
+etapa2/src/lex.yy.c
+etapa2/src/parser.tab.c
+etapa2/src/parser.tab.h
+etapa3/src/lex.yy.c
+etapa3/src/parser.tab.c
+etapa3/src/parser.tab.h
+
+# Arquivos temporários de teste
+_test.s
+_test_bin
+/tmp/_test_e3.s
+/tmp/_test_e3_bin
+
+# Arquivos de submissão
+*.tar.gz
